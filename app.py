@@ -8,11 +8,7 @@ import plotly.express as px
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-st.write("# Visualisation d'impacts carbone")
-
-if not os.path.isfile('data.csv'):
-    print('Making request')
-
+def load_remote_data():
     # Load data from ADEME API
     base_url = "https://data.ademe.fr/data-fair/api/v1/datasets/base-carboner/"
     # api_key = "API key"
@@ -66,11 +62,16 @@ if not os.path.isfile('data.csv'):
             for row in data['results']:
                 row_values = [row.get(key, None) for key in headers]
                 csvwriter.writerow(row_values)
+
+st.write("# Visualisation d'impacts carbone")
+
+if not os.path.isfile('data.csv'):
+    print('Making request')
+    load_remote_data()
 else:
     print('Loading saved data')
 
 #print(json.dumps(data, indent=4))  # Analyzing response output
-
 df = pd.read_csv('data.csv')    # selected useful cols = ['Nom_base_français', 'Type_poste', 'Nom_poste_français', 'Code_de_la_catégorie', 'Localisation_géographique', 'Total_poste_non_décomposé','Unité_français', 'Incertitude', 'Contributeur', 'Source']
 
 # Preprocessing / Cleaning
@@ -101,23 +102,25 @@ df['Nom_base_français'] = df['Nom_base_français'].apply(lambda f : ' '.join(f.
 input_data = df.copy()
 categories_selected = []
 current_cat = None
-for cat_id in range(nb_categories):
+with st.sidebar:
+    with st.expander("**Plot filters**"):
+        for cat_id in range(nb_categories):
 
-    if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
-        # Still sub categories to choose
-        if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
-            current_cat = st.sidebar.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique())
-            input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
-            categories_selected.append(current_cat)
-            last_cat_level = f'cat{cat_id}'
-            title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
+            if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
+                # Still sub categories to choose
+                if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
+                    current_cat = st.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique())
+                    input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
+                    categories_selected.append(current_cat)
+                    last_cat_level = f'cat{cat_id}'
+                    title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
 
-        elif input_data['nb_cat'].min()-1>=cat_id :
-            current_cat = st.sidebar.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
-            input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
-            categories_selected.append(current_cat)
-            title = input_data['Code_de_la_catégorie'].unique()[0]
-            last_cat_level = f'cat{cat_id}'
+                elif input_data['nb_cat'].min()-1>=cat_id :
+                    current_cat = st.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
+                    input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
+                    categories_selected.append(current_cat)
+                    title = input_data['Code_de_la_catégorie'].unique()[0]
+                    last_cat_level = f'cat{cat_id}'
 
 # cat0, cat1, cat2, cat3, cat4, cat5 = categories_selected
 
@@ -159,3 +162,8 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+with st.sidebar:
+    # with st.container():
+    with st.expander("**Language**"):
+        language = st.selectbox('',['FR','EN']) #Language
