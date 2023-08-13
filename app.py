@@ -106,14 +106,14 @@ for cat_id in range(nb_categories):
     if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
         # Still sub categories to choose
         if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
-            current_cat = st.sidebar.multiselect(f'Subcategory {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique())
+            current_cat = st.sidebar.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique())
             input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
             categories_selected.append(current_cat)
             last_cat_level = f'cat{cat_id}'
             title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
 
         elif input_data['nb_cat'].min()-1>=cat_id :
-            current_cat = st.sidebar.selectbox(f'Subcategory {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
+            current_cat = st.sidebar.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
             input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
             categories_selected.append(current_cat)
             title = input_data['Code_de_la_catégorie'].unique()[0]
@@ -147,8 +147,9 @@ fig = px.bar(
     color=input_data[last_cat_level],
     hover_data=[x_feature],
     labels={
-        x_feature:'Nom du produit/service',
+        x_feature2:'Nom du produit/service',
         y_feature:f"{'<br>'.join(input_data['Unité_français'].unique())}",
+        last_cat_level : 'Categories'
     })
 fig.update_layout(
     height= 600,
