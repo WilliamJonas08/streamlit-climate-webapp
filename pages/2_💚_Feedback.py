@@ -1,4 +1,5 @@
 # Inspired from https://www.youtube.com/watch?v=FOULV9Xij_8
+# Form Submit : https://formsubmit.co/
 
 import streamlit as st  # pip install streamlit
 
@@ -20,3 +21,6 @@ contact_form = """
 """
 
 st.markdown(contact_form, unsafe_allow_html=True)
+
+with st.container():
+    st.markdown(f"If the form above doesn't work, you can try with this (secured) link: https://formsubmit.co/el/nabolo")
