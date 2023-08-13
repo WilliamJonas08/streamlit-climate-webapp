@@ -9,6 +9,12 @@ In order to use the web application, you must:
 
 Enjoy :) 
 
+## Data sources
+
+Data comes from one ADEME Dataset about carbon emissions.
+
+API url: https://data.ademe.fr/datasets/base-carboner
+
 ## Preview
 
 <br>
