@@ -5,6 +5,8 @@ import os
 import pandas as pd
 import plotly.express as px
 
+st.set_page_config(page_title="Climate Chart", page_icon="🌱")
+
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
@@ -63,16 +65,26 @@ def load_remote_data():
                 row_values = [row.get(key, None) for key in headers]
                 csvwriter.writerow(row_values)
 
+def is_integer(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
+
+
 st.write("# Visualisation d'impacts carbone")
 
 if not os.path.isfile('data.csv'):
     print('Making request')
-    load_remote_data()
+    with st.spinner('Requesting for remote data ...'):
+        load_remote_data()
 else:
     print('Loading saved data')
-
 #print(json.dumps(data, indent=4))  # Analyzing response output
-df = pd.read_csv('data.csv')    # selected useful cols = ['Nom_base_français', 'Type_poste', 'Nom_poste_français', 'Code_de_la_catégorie', 'Localisation_géographique', 'Total_poste_non_décomposé','Unité_français', 'Incertitude', 'Contributeur', 'Source']
+
+with st.spinner('Reading data ...'):
+    df = pd.read_csv('data.csv')    # selected useful cols = ['Nom_base_français', 'Type_poste', 'Nom_poste_français', 'Code_de_la_catégorie', 'Localisation_géographique', 'Total_poste_non_décomposé','Unité_français', 'Incertitude', 'Contributeur', 'Source']
 
 # Preprocessing / Cleaning
 
@@ -83,12 +95,6 @@ for i in range(max_sub_cat):
 df['nb_cat'] = df['Code_de_la_catégorie'].apply(lambda f: len(f.split('>')))
 nb_categories = df['nb_cat'].max()
 
-def is_integer(string):
-    try:
-        int(string)
-        return True
-    except ValueError:
-        return False
 df['Nom_base_français'] = df['Nom_base_français'].apply(lambda f : f.replace('""""','').replace('"""','').replace('\t',''))     # Weird strings
 df['Nom_base_français'] = df['Nom_base_français'].apply(lambda f : ' '.join(f.split(' ')[1:]) if is_integer(f.split(' ')[0]) else f)    # Names beginning with integers
 
@@ -121,12 +127,6 @@ with st.sidebar:
                     categories_selected.append(current_cat)
                     title = input_data['Code_de_la_catégorie'].unique()[0]
                     last_cat_level = f'cat{cat_id}'
-
-# cat0, cat1, cat2, cat3, cat4, cat5 = categories_selected
-
-# st.write(input_data['nb_cat'].min())
-# st.write(input_data['nb_cat'].max())
-
 
 # Plot
 
@@ -162,8 +162,3 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-
-with st.sidebar:
-    # with st.container():
-    with st.expander("**Language**"):
-        language = st.selectbox('',['FR','EN']) #Language
