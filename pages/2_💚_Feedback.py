@@ -1,7 +1,7 @@
 # Inspired from https://www.youtube.com/watch?v=FOULV9Xij_8
 # Form Submit : https://formsubmit.co/
 
-import streamlit as st  # pip install streamlit
+import streamlit as st
 
 with open('style/feedback.css') as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)

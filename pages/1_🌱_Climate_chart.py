@@ -10,6 +10,8 @@ st.set_page_config(page_title="Climate Chart", page_icon="🌱")
 with open('style/climate_chart.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+st.session_state['language'] = 'EN' # Manual initialization
+
 def load_remote_data():
     # Load data from ADEME API
     base_url = "https://data.ademe.fr/data-fair/api/v1/datasets/base-carboner/"
