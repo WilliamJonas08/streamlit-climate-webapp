@@ -72,6 +72,8 @@ def is_integer(string):
     except ValueError:
         return False
 
+def no_data_warning():
+    st.warning('No data to display with the selected filters')
 
 st.write("# Visualisation d'impacts carbone")
 
@@ -112,21 +114,29 @@ with st.sidebar:
     with st.expander("**Plot filters**"):
         for cat_id in range(nb_categories):
 
-            if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
-                # Still sub categories to choose
-                if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
-                    current_cat = st.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique())
-                    input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
-                    categories_selected.append(current_cat)
-                    last_cat_level = f'cat{cat_id}'
-                    title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
+                if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
+                    # Still sub categories to choose
+                    if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
+                        current_cat = st.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique())
+                        input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
 
-                elif input_data['nb_cat'].min()-1>=cat_id :
-                    current_cat = st.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
-                    input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
-                    categories_selected.append(current_cat)
-                    title = input_data['Code_de_la_catégorie'].unique()[0]
-                    last_cat_level = f'cat{cat_id}'
+                        if input_data.shape[0]>0:
+                            categories_selected.append(current_cat)
+                            last_cat_level = f'cat{cat_id}'
+                            title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
+                        else:
+                            no_data_warning()
+
+                    elif input_data['nb_cat'].min()-1>=cat_id :
+                        current_cat = st.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
+                        input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
+
+                        if input_data.shape[0]>0:
+                            categories_selected.append(current_cat)
+                            title = input_data['Code_de_la_catégorie'].unique()[0]
+                            last_cat_level = f'cat{cat_id}'
+                        else: 
+                            no_data_warning()
 
 # Plot
 
@@ -161,4 +171,8 @@ fig.update_layout(
     width= 800,
 )
 
-st.plotly_chart(fig, use_container_width=True)
+if input_data.shape[0]>0:
+    st.plotly_chart(fig, use_container_width=True)
+else: 
+    # When all last subcategories are not unselected
+    no_data_warning()
