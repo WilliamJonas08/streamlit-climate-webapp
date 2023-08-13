@@ -65,13 +65,6 @@ def load_remote_data():
                 row_values = [row.get(key, None) for key in headers]
                 csvwriter.writerow(row_values)
 
-def is_integer(string):
-    try:
-        int(string)
-        return True
-    except ValueError:
-        return False
-
 def no_data_warning():
     st.warning('No data to display with the selected filters')
 
@@ -98,8 +91,7 @@ df['nb_cat'] = df['Code_de_la_catégorie'].apply(lambda f: len(f.split('>')))
 nb_categories = df['nb_cat'].max()
 
 df['Nom_base_français'] = df['Nom_base_français'].apply(lambda f : f.replace('""""','').replace('"""','').replace('\t',''))     # Weird strings
-df['Nom_base_français'] = df['Nom_base_français'].apply(lambda f : ' '.join(f.split(' ')[1:]) if is_integer(f.split(' ')[0]) else f)    # Names beginning with integers
-
+df['Type_poste'] = df['Type_poste'].fillna('--Not applicable--')
 
 # Data selection by user
 
@@ -114,6 +106,12 @@ with st.sidebar:
     with st.expander("**Localisation filter**"):
         scale = st.multiselect('',options=input_data['Localisation_géographique'].unique(), default=input_data[f'Localisation_géographique'].unique())
         input_data=input_data[input_data['Localisation_géographique'].isin(scale)]
+        if input_data.shape[0]==0:
+            no_data_warning()
+    
+    with st.expander("**Type filter**"):
+        type = st.multiselect('',options=input_data['Type_poste'].unique(), default=input_data[f'Type_poste'].unique())
+        input_data=input_data[input_data['Type_poste'].isin(type)]
         if input_data.shape[0]==0:
             no_data_warning()
 
@@ -146,7 +144,8 @@ with st.sidebar:
     
 # Plot
 
-x_feature = "Nom_base_français"
+language_suffix = 'français' if st.session_state['language']=='FR' else 'anglais'
+x_feature = f"Nom_base_{language_suffix}"
 y_feature = "Total_poste_non_décomposé"
 
 # Fix some particular use cases
@@ -170,7 +169,7 @@ if input_data.shape[0]>0:
         hover_data=[x_feature],
         labels={
             x_feature2:'Nom du produit/service',
-            y_feature:f"{'<br>'.join(input_data['Unité_français'].unique())}",
+            y_feature:f"{'<br>'.join(input_data[f'Unité_{language_suffix}'].unique())}",
             last_cat_level : 'Categories'
         },
         barmode='group')

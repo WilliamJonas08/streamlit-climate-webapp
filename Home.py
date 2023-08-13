@@ -15,9 +15,12 @@ with open('README.md', 'r') as f:
         st.markdown(row, unsafe_allow_html=True)
 
 with st.sidebar:
-    # with st.container():
     with st.expander("**Language**"):
-        st.session_state['language'] = st.selectbox('',['FR','EN']) #Language
-
-    # st.success("Select a demo above.")
-    st.warning("Language feature not available for now (please accept french)")
+        language = st.selectbox('',['FR','EN']) #Language
+        st.session_state['language'] = language
+        # if language=='EN':
+        #     st.success("Language switched to English")
+        # elif language=='FR':
+        #     st.success("Langue changée en Français")
+    if language=='EN':
+        st.warning("Language feature only available for product/services names (in climate chart section)")
