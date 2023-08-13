@@ -111,7 +111,13 @@ input_data = df.copy()
 categories_selected = []
 current_cat = None
 with st.sidebar:
-    with st.expander("**Plot filters**"):
+    with st.expander("**Localisation filter**"):
+        scale = st.multiselect('',options=input_data['Localisation_géographique'].unique(), default=input_data[f'Localisation_géographique'].unique())
+        input_data=input_data[input_data['Localisation_géographique'].isin(scale)]
+        if input_data.shape[0]==0:
+            no_data_warning()
+
+    with st.expander("**Categories filter**"):
         for cat_id in range(nb_categories):
 
                 if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
@@ -137,7 +143,7 @@ with st.sidebar:
                             last_cat_level = f'cat{cat_id}'
                         else: 
                             no_data_warning()
-
+    
 # Plot
 
 x_feature = "Nom_base_français"
@@ -154,24 +160,24 @@ size_item_name = 40
 input_data['x_feature_croped'] = input_data[x_feature].apply(lambda f: f[:size_item_name])
 x_feature2 = 'x_feature_croped'
 
-fig = px.bar(
-    input_data, 
-    x=x_feature2, 
-    y=y_feature,
-    title=title,
-    color=input_data[last_cat_level],
-    hover_data=[x_feature],
-    labels={
-        x_feature2:'Nom du produit/service',
-        y_feature:f"{'<br>'.join(input_data['Unité_français'].unique())}",
-        last_cat_level : 'Categories'
-    })
-fig.update_layout(
-    height= 600,
-    width= 800,
-)
-
 if input_data.shape[0]>0:
+    fig = px.bar(
+        input_data, 
+        x=x_feature2, 
+        y=y_feature,
+        title=title,
+        color=input_data[last_cat_level],
+        hover_data=[x_feature],
+        labels={
+            x_feature2:'Nom du produit/service',
+            y_feature:f"{'<br>'.join(input_data['Unité_français'].unique())}",
+            last_cat_level : 'Categories'
+        })
+    fig.update_layout(
+        height= 600,
+        width= 800,
+    )
+
     st.plotly_chart(fig, use_container_width=True)
 else: 
     # When all last subcategories are not unselected
