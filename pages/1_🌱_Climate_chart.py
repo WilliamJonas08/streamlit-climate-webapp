@@ -172,7 +172,8 @@ if input_data.shape[0]>0:
             x_feature2:'Nom du produit/service',
             y_feature:f"{'<br>'.join(input_data['Unité_français'].unique())}",
             last_cat_level : 'Categories'
-        })
+        },
+        barmode='group')
     fig.update_layout(
         height= 600,
         width= 800,
