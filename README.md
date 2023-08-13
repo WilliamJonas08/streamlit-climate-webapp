@@ -4,7 +4,13 @@
 
 ### Getting started
 
-In order to use the web application, you must:
+#### Online use
+
+You can access the deployed version of the application at the following url: https://app-climate-webapp-ldfkuqprvtzxldy6qnzf65.streamlit.app/
+
+#### Local use
+
+In order to use the web application locally, you must:
 - clone the repository
 - install the required dependencies running the command ```pip install -r requirements.txt```.
 - run the command ```streamlit run Home.py``` to run the application.
