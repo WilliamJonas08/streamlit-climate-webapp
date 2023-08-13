@@ -86,11 +86,13 @@ for cat_id in range(nb_categories):
             input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
             categories_selected.append(current_cat)
             last_cat_level = f'cat{cat_id}'
+            title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
 
         elif input_data['nb_cat'].min()-1>=cat_id :
             current_cat = st.sidebar.selectbox(f'Subcategory {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
             input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
             categories_selected.append(current_cat)
+            title = input_data['Code_de_la_catégorie'].unique()[0]
 # cat0, cat1, cat2, cat3, cat4, cat5 = categories_selected
 
 # st.write(input_data['nb_cat'].min())
@@ -112,11 +114,11 @@ fig = px.bar(
     input_data, 
     x=x_feature, 
     y=y_feature,
-    title=input_data['Code_de_la_catégorie'].unique()[0],
+    title=title,
     color=input_data[last_cat_level],
     labels={
         x_feature:'Nom du produit/service',
-        y_feature:input_data['Unité_français'].unique()[0],
+        y_feature:f"{'<br>'.join(input_data['Unité_français'].unique())}",
     })
 
 st.plotly_chart(fig, use_container_width=True)
