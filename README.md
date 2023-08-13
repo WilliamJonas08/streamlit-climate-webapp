@@ -25,6 +25,8 @@ API url: https://data.ademe.fr/datasets/base-carboner
 </p>
 <!-- ![Preview of the web application](preview.png) -->
 
+### Contact me
 
+**Linkedin:** https://www.linkedin.com/in/jonas-william/
 
 <!-- Ressources : https://www.youtube.com/watch?v=gr_KyGfO_eU&list=PLtqF5YXg7GLmCvTswG32NqQypOuYkPRUE&index=36 -->

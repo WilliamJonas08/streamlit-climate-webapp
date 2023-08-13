@@ -3,7 +3,7 @@ import pandas as pd
 
 
 st.set_page_config(
-    page_title="Main page",
+    page_title="Climate web app",
     page_icon="🌍",
 )
 
