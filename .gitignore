@@ -1,0 +1,8 @@
+# Virtual env
+streamlit_app_env/
+
+# Data
+data.csv
+
+# Notebooks
+tests.ipynb
