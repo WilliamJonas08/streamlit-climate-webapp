@@ -117,6 +117,8 @@ for cat_id in range(nb_categories):
             input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
             categories_selected.append(current_cat)
             title = input_data['Code_de_la_catégorie'].unique()[0]
+            last_cat_level = f'cat{cat_id}'
+
 # cat0, cat1, cat2, cat3, cat4, cat5 = categories_selected
 
 # st.write(input_data['nb_cat'].min())
