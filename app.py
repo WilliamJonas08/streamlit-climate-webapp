@@ -21,27 +21,51 @@ if not os.path.isfile('data.csv'):
     #     "Authorization": f"Bearer {api_key}"
     # }
 
-    response_schema = requests.get(base_url+'safe-schema').json()
+    response_schema = requests.get(base_url+'safe-schema').json()   # , headers=headers
     columns = [el['key'] for el in response_schema]
 
-    response = requests.get(base_url+'lines?size=1000')# , headers=headers
+    
+    # Get number of items in the db
+    response = requests.get(base_url+'lines')
     if response.status_code == 200:
         data = response.json()
-        # Traitez les données ici
+        # print(f'Number of items in the db: {data["total"]}')
     else:
-        # print("Erreur lors de la requête :", response.status_code)
-        raise ValueError(f"Erreur lors de la requête : {response.status_code}")
+        print("Erreur lors de la requête :", response.status_code)
+    nb_items = data["total"]
 
-    with open('data.csv', 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        headers= columns
-        csvwriter.writerow(headers)
+    # Request all the lines of the dataset
+    nb_items_received=0
+    batch_size = 1000
+    url_suffix = f'lines?size={batch_size}'
+    mode = 'w'
+    while nb_items_received <nb_items:
+        print(f'Request {nb_items_received//batch_size} / {(nb_items//batch_size)+1}')
+        if nb_items_received>0:
+            url_suffix = data['next'].split('/')[-1]
+            mode = 'a'
 
-        # Écrire les lignes de données
-        for row in data['results']:
-            row_values = [row.get(key, None) for key in headers]
-            csvwriter.writerow(row_values)
-    # print("Conversion en CSV terminée.")
+        response = requests.get(base_url+url_suffix)
+
+        if response.status_code == 200:
+            data = response.json()
+            nb_items_received += batch_size
+        else:
+            print("Erreur lors de la requête :", response.status_code)
+
+        # Write response data into csv file
+        with open('data.csv', mode=mode, newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
+
+            # Écrire les en-têtes
+            if mode=='w':
+                headers= columns
+                csvwriter.writerow(headers)
+
+            # Écrire les lignes de données
+            for row in data['results']:
+                row_values = [row.get(key, None) for key in headers]
+                csvwriter.writerow(row_values)
 else:
     print('Loading saved data')
 
