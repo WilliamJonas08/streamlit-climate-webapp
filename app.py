@@ -134,15 +134,25 @@ y_feature = "Total_poste_non_décomposé"
 #     # We update the product name for a better plot
 #     input_data[x_feature] = input_data.apply(lambda f: f[x_feature]+'_'+f[last_cat_level], axis=0)
 
+# Crop items names if too long to don't affect the display
+size_item_name = 40
+input_data['x_feature_croped'] = input_data[x_feature].apply(lambda f: f[:size_item_name])
+x_feature2 = 'x_feature_croped'
+
 fig = px.bar(
     input_data, 
-    x=x_feature, 
+    x=x_feature2, 
     y=y_feature,
     title=title,
     color=input_data[last_cat_level],
+    hover_data=[x_feature],
     labels={
         x_feature:'Nom du produit/service',
         y_feature:f"{'<br>'.join(input_data['Unité_français'].unique())}",
     })
+fig.update_layout(
+    height= 600,
+    width= 800,
+)
 
 st.plotly_chart(fig, use_container_width=True)
