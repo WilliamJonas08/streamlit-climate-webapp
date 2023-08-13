@@ -1,0 +1,1 @@
+Simple Web App using Streamlit and using ADEME API in order to display relevant carbon emmssion impact of product and services surronding us.
