@@ -29,3 +29,18 @@ input[type=text], input[type=email], textarea {
   div.css-nahz7x.e1nzilvr4{
     margin-top: 2rem;
   }
+
+
+  /* Alternative button link */
+  a.send-bttn {
+    background-color: #04AA6D;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  a.send-bttn:hover {
+    background-color: #45a049;
+  }
