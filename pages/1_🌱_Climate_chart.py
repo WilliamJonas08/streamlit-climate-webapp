@@ -354,6 +354,7 @@ def plot_diet_chart(df):
             st.markdown(body=mk, unsafe_allow_html=True)
         else: 
             no_data_warning('Not enought data with the selected filters (at least 2 dishes are required)')
+        
 
 st.write("# Visualisation d'impacts carbone")
 
@@ -379,6 +380,7 @@ with meat:
     st.session_state['tab'] = 'meat'
     plot_diet_chart(df)
 
+st.markdown("</br></br></br>Source ADEME : https://data.ademe.fr/datasets/base-carboner", unsafe_allow_html=True)
 
 
 
