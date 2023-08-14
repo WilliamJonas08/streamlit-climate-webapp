@@ -107,47 +107,49 @@ def plot_all_data(df):
     categories_selected = []
     current_cat = None
     with st.sidebar:
-        with st.container():
-            st.header('All data filters')
-            with st.expander("**Categories**"):
-                for cat_id in range(nb_categories):
+        st.header('All data filters')
+        with st.expander("**Categories**"):
+            for cat_id in range(nb_categories):
 
-                        if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
-                            # Still sub categories to choose
-                            if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
-                                current_cat = st.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique(), key=cat_id)
-                                input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
+                    if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
+                        # Still sub categories to choose
+                        if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
+                            current_cat = st.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique(), key=cat_id)
+                            input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
 
-                                if input_data.shape[0]>0:
-                                    categories_selected.append(current_cat)
-                                    last_cat_level = f'cat{cat_id}'
-                                    title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
-                                else:
-                                    no_data_warning()
+                            if input_data.shape[0]>0:
+                                categories_selected.append(current_cat)
+                                last_cat_level = f'cat{cat_id}'
+                                title = pattern.join(input_data['Code_de_la_catégorie'].unique()[0].split(pattern)[:cat_id])
+                            else:
+                                no_data_warning()
 
-                            elif input_data['nb_cat'].min()-1>=cat_id :
-                                current_cat = st.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
-                                input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
+                        elif input_data['nb_cat'].min()-1>=cat_id :
+                            current_cat = st.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
+                            input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
 
-                                if input_data.shape[0]>0:
-                                    categories_selected.append(current_cat)
-                                    title = input_data['Code_de_la_catégorie'].unique()[0]
-                                    last_cat_level = f'cat{cat_id}'
-                                else: 
-                                    no_data_warning()
-            
-            st.write('Other filters')
-            with st.expander("**Localisation**"):
-                scale = st.multiselect('',options=input_data['Localisation_géographique'].unique(), default=input_data[f'Localisation_géographique'].unique(), key="scale")
-                input_data=input_data[input_data['Localisation_géographique'].isin(scale)]
-                if input_data.shape[0]==0:
-                    no_data_warning()
+                            if input_data.shape[0]>0:
+                                categories_selected.append(current_cat)
+                                title = input_data['Code_de_la_catégorie'].unique()[0]
+                                last_cat_level = f'cat{cat_id}'
+                            else: 
+                                no_data_warning()
         
-            with st.expander("**Type**"):
-                type = st.multiselect('',options=input_data['Type_poste'].unique(), default=input_data[f'Type_poste'].unique(), key="type")
-                input_data=input_data[input_data['Type_poste'].isin(type)]
-                if input_data.shape[0]==0:
-                    no_data_warning()
+        st.write('Other filters')
+        with st.expander("**Localisation**"):
+            scale = st.multiselect('',options=input_data['Localisation_géographique'].unique(), default=input_data[f'Localisation_géographique'].unique(), key="scale")
+            input_data=input_data[input_data['Localisation_géographique'].isin(scale)]
+            if input_data.shape[0]==0:
+                no_data_warning()
+    
+        with st.expander("**Type**"):
+            type = st.multiselect('',options=input_data['Type_poste'].unique(), default=input_data[f'Type_poste'].unique(), key="type")
+            input_data=input_data[input_data['Type_poste'].isin(type)]
+            if input_data.shape[0]==0:
+                no_data_warning()
+        
+        st.markdown("<br>Source <strong>ADEME</strong> : https://data.ademe.fr/datasets/base-carboner", unsafe_allow_html=True)
+        
 
     # PLOT
     # if st.session_state['tab'] == 'all_data':
@@ -355,7 +357,6 @@ def plot_diet_chart(df):
         else: 
             no_data_warning('Not enought data with the selected filters (at least 2 dishes are required)')
         
-
 st.write("# Visualisation d'impacts carbone")
 
 df = init_page_data()
@@ -380,7 +381,6 @@ with meat:
     st.session_state['tab'] = 'meat'
     plot_diet_chart(df)
 
-st.markdown("</br></br></br>Source ADEME : https://data.ademe.fr/datasets/base-carboner", unsafe_allow_html=True)
 
 
 
