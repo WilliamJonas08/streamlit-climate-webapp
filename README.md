@@ -13,7 +13,7 @@ You can access the deployed version of the application here :
 </div> -->
 
 
-<a href="https://app-climate-webapp-ldfkuqprvtzxldy6qnzf65.streamlit.app/" style="display: inline-block; padding: 1rem; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px;">Visit app</a>
+<a href="https://app-climate-webapp-ldfkuqprvtzxldy6qnzf65.streamlit.app/" style="display: inline-block; padding: 1rem; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px;" target="_blank">Visit app</a>
 
 
 or at the following url: https://app-climate-webapp-ldfkuqprvtzxldy6qnzf65.streamlit.app/
