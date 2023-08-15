@@ -281,7 +281,7 @@ def plot_diet_chart(df):
     df = df.loc[ mask_carnivore | mask_vege | mask_vegan]
 
     with st.container():
-        if df.shape[0]>2:
+        if df.shape[0]>0:
     
             input_data = df.copy()
             input_data = input_data.groupby(['cat_plot', "name_mapped"])["Total_poste_non_décomposé"].mean().reset_index()
@@ -337,9 +337,9 @@ def plot_diet_chart(df):
                 <div style="display: flex; justify-content: center; margin-top:1.5rem;">
                     <div style="border: 2px solid #ccc; padding: 1rem 1.5rem 1rem 1.5rem; border-radius: 10px;">
                         <p style="margin:0;">
-                            <strong style="font-size: 1.5rem; text-align: left;">{aliment1}</strong>  émet <br>
+                            1kg de <strong style="font-size: 1.5rem; text-align: left;">{aliment1}</strong> émet<br>
                         </p>
-                        <div>
+                        <div style="text-align: center;">
                             <span style="color: {'red' if difference >0 else 'green'}; font-size: 2.5rem;">
                                 {'+' if difference >0 else ''} {difference.round(1)}
                             </span>
@@ -348,7 +348,7 @@ def plot_diet_chart(df):
                             </div>
                         </div>
                         <p style="text-align: right;margin:0;">
-                            que  <strong style="font-size: 1.5rem;">{aliment2}</strong>
+                            que 1kg de <strong style="font-size: 1.5rem;">{aliment2}</strong>
                         </p>
                     </div>
                 </div>
