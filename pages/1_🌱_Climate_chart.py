@@ -191,6 +191,13 @@ def plot_all_data(df):
         fig.update_layout(
             height= 600,
             width= 800,
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=1.08,
+                xanchor="right",
+                x=1
+            )
         )
 
         st.plotly_chart(fig, use_container_width=True)
@@ -301,6 +308,16 @@ def plot_diet_chart(df):
                     "Total_poste_non_décomposé": 'kgCO2e/kg', #f"{'<br>'.join(df[f'Unité_français'].unique())}",
                     'cat_plot':'Diet'
                 })
+            
+            fig.update_layout(
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
 
             st.plotly_chart(fig, use_container_width=True)
         else: 
