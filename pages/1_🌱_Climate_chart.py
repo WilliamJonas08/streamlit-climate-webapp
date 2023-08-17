@@ -72,15 +72,15 @@ def clean_data(df):
     # Choice data status within 'Archivé', 'Valide générique', 'Refusé', 'En brouillon','Valide spécifique', 'En discussion', 'Supprimé'
     df = df[df["Statut_de_l'élément"]=='Valide générique']
 
-    df['Nom_base_français'] = df['Nom_base_français'].apply(lambda f : f.replace('""""','').replace('"""','').replace('\t',''))     # Weird strings
-    df['Type_poste'] = df['Type_poste'].fillna('--Not applicable--')
+    df.loc[:,'Nom_base_français'] = df['Nom_base_français'].apply(lambda f : f.replace('""""','').replace('"""','').replace('\t',''))     # Weird strings
+    df.loc[:,'Type_poste'] = df['Type_poste'].fillna('--Not applicable--')
 
     # Removing some duplicated names
     df.loc[df.cat2=='Produits animaux','Nom_base_français'] = df.loc[df.cat2=='Produits animaux','Nom_base_français'].apply(lambda f: f.lower().replace(' de ', ' ').capitalize())
 
     # Lacks of translations
-    df['Nom_base_anglais'] = df['Nom_base_anglais'].fillna(df['Nom_base_français'])
-    df['Unité_anglais'] = df['Unité_anglais'].fillna(df['Unité_français'])
+    df.loc[:,'Nom_base_anglais'] = df['Nom_base_anglais'].fillna(df['Nom_base_français'])
+    df.loc[:,'Unité_anglais'] = df['Unité_anglais'].fillna(df['Unité_français'])
     return df
 
 def no_data_warning(message='No data to display with the selected filters'):
@@ -114,7 +114,7 @@ def plot_all_data(df):
                     if (input_data['nb_cat'].min()>cat_id) :   #& (current_cat!="Select an option")
                         # Still sub categories to choose
                         if (input_data['nb_cat'].min()-1==cat_id) & (input_data['nb_cat'].max()-1==cat_id):   #& input_data['nb_cat'].max()==cat_id
-                            current_cat = st.multiselect(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique(), key=cat_id)
+                            current_cat = st.multiselect(label=f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique(), default=input_data[f'cat{cat_id}'].unique(), key=cat_id)
                             input_data = input_data[input_data[f'cat{cat_id}'].isin(current_cat)]
 
                             if input_data.shape[0]>0:
@@ -125,7 +125,7 @@ def plot_all_data(df):
                                 no_data_warning()
 
                         elif input_data['nb_cat'].min()-1>=cat_id :
-                            current_cat = st.selectbox(f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
+                            current_cat = st.selectbox(label=f'Category - level {cat_id}',options=input_data[f'cat{cat_id}'].unique())    #options = ["Select an option",  *input_data[f'cat{cat_id}'].unique()]
                             input_data = input_data[input_data[f'cat{cat_id}']==current_cat]
 
                             if input_data.shape[0]>0:
@@ -137,13 +137,13 @@ def plot_all_data(df):
         
         st.write('Other filters')
         with st.expander("**Localisation**"):
-            scale = st.multiselect('',options=input_data['Localisation_géographique'].unique(), default=input_data[f'Localisation_géographique'].unique(), key="scale")
+            scale = st.multiselect(label='localisation',options=input_data['Localisation_géographique'].unique(), default=input_data[f'Localisation_géographique'].unique(), key="scale", label_visibility='collapsed')
             input_data=input_data[input_data['Localisation_géographique'].isin(scale)]
             if input_data.shape[0]==0:
                 no_data_warning()
     
         with st.expander("**Type**"):
-            type = st.multiselect('',options=input_data['Type_poste'].unique(), default=input_data[f'Type_poste'].unique(), key="type")
+            type = st.multiselect(label='type',options=input_data['Type_poste'].unique(), default=input_data[f'Type_poste'].unique(), key="type", label_visibility='collapsed')
             input_data=input_data[input_data['Type_poste'].isin(type)]
             if input_data.shape[0]==0:
                 no_data_warning()
@@ -156,6 +156,7 @@ def plot_all_data(df):
     language_suffix = 'français' if st.session_state['language']=='FR' else 'anglais'
     x_feature = f"Nom_base_{language_suffix}"
     y_feature = "Total_poste_non_décomposé"
+    y_label_unit = f"{'<br>'.join(input_data[f'Unité_{language_suffix}'].unique())}"    # TODO Can be updated
 
     # Fix some particular use cases (eg planes with different number of passengers)
     # if input_data.groupby([x_feature])[last_cat_level].nunique()>0: 
@@ -164,12 +165,14 @@ def plot_all_data(df):
     #     input_data[x_feature] = input_data.apply(lambda f: f[x_feature]+'_'+f[last_cat_level], axis=0)
 
     # Crop items names if too long to don't affect the display
-    size_item_name = 40
+    max_size_item_name = 40
+    input_data['x_feature_croped'] = input_data[x_feature].apply(lambda f: f[:max_size_item_name])
+    x_feature2 = 'x_feature_croped'
 
-    input_data['x_feature_croped'] = input_data[x_feature].apply(lambda f: f[:size_item_name])
+    input_data = input_data.groupby([last_cat_level,x_feature2]).aggregate({y_feature:'mean',x_feature:lambda f :f"{'<br>'.join(pd.unique(f))}"}).reset_index()
+
     input_data = input_data.sort_values(y_feature, ascending=False)
 
-    x_feature2 = 'x_feature_croped'
 
     if input_data.shape[0]>0:
         fig = px.bar(
@@ -181,7 +184,7 @@ def plot_all_data(df):
             hover_data=[x_feature],
             labels={
                 x_feature2:'Nom du produit/service',
-                y_feature:f"{'<br>'.join(input_data[f'Unité_{language_suffix}'].unique())}",
+                y_feature:y_label_unit,
                 last_cat_level : 'Categories'
             },
             barmode='group')
@@ -220,11 +223,11 @@ def plot_diet_chart(df):
     list_animals_raw_products=['Oeuf', 'Lait vache', 'Lait chèvre', 'Lait brebis', 'Laine']
 
     with st.expander('Vegan dishes'):
-        list_vegan = st.multiselect('', options=LIST_VEGAN, default=LIST_VEGAN, key="vegan")
+        list_vegan = st.multiselect(label='vegan', options=LIST_VEGAN, default=LIST_VEGAN, key="vegan", label_visibility='collapsed')
     with st.expander('Vegge dishes'):
-        list_vege = st.multiselect('', options=LIST_VEGGE, default=LIST_VEGGE, key="vegge")
+        list_vege = st.multiselect(label='vegge', options=LIST_VEGGE, default=LIST_VEGGE, key="vegge", label_visibility='collapsed')
     with st.expander('Carnivore dishes'):
-        list_carnivore = st.multiselect('', options=LIST_CARNIVORE, default=LIST_CARNIVORE, key="carnivore")
+        list_carnivore = st.multiselect(label='carnivore', options=LIST_CARNIVORE, default=LIST_CARNIVORE, key="carnivore", label_visibility='collapsed')
 
     def matching(key, str):
         try:
@@ -322,11 +325,11 @@ def plot_diet_chart(df):
             aliment2 = input_data.iloc[1].name_mapped
             col1, col2 = st.columns(2)
             with col1:
-                aliment1 = st.selectbox('Aliment A', options=[item for item in input_data.name_mapped.unique() if item != aliment2], index=find_element_index('Beauf',[item for item in input_data.name_mapped.unique() if item != aliment2]))
+                aliment1 = st.selectbox(label='Aliment A', options=[item for item in input_data.name_mapped.unique() if item != aliment2], index=find_element_index('Beauf',[item for item in input_data.name_mapped.unique() if item != aliment2]))
                 v1_value = input_data.query("name_mapped==@aliment1")['Total_poste_non_décomposé'].values[0]
                 st.write(f'{v1_value.round(1)} kgCO2e/kg')
             with col2:
-                aliment2 = st.selectbox('Aliment B', options=[item for item in input_data.name_mapped.unique() if item != aliment1], index=find_element_index('Tofu',[item for item in input_data.name_mapped.unique() if item != aliment1]))
+                aliment2 = st.selectbox(label='Aliment B', options=[item for item in input_data.name_mapped.unique() if item != aliment1], index=find_element_index('Tofu',[item for item in input_data.name_mapped.unique() if item != aliment1]))
                 v2_value = input_data.query("name_mapped==@aliment2")['Total_poste_non_décomposé'].values[0]
                 st.write(f'{v2_value.round(1)} kgCO2e/kg')
 
