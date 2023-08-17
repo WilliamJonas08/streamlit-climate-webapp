@@ -24,7 +24,7 @@ st.write("Don't forget to leave a feedback in the corresponding section about wh
 
 with st.sidebar:
     with st.expander("**Language**"):
-        language = st.selectbox('',['FR','EN']) #Language
+        language = st.selectbox(label='language',options=['FR','EN'], label_visibility='collapsed') #Language 
         st.session_state['language'] = language
         # if language=='EN':
         #     st.success("Language switched to English")
